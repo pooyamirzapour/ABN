@@ -14,5 +14,8 @@ public interface RecipeRepository {
 
     Optional<Recipe> get(int id);
 
+    void delete(int id);
+
+
     List<Recipe> query(String[] include, String[] exclude, String[] instruction, String[] noServings, String[] type);
 }

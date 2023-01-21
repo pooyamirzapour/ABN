@@ -22,10 +22,14 @@ import java.util.stream.Collectors;
 public interface RecipeConvertor {
     RecipeConvertor INSTANCE = Mappers.getMapper(RecipeConvertor.class);
 
-//    @ValueMapping(target = "type", source = "type")
-//    Recipe dtoToRecipe(RecipeRequestDTO recipeRequestDTO);
-
     RecipeEntity recipeToEntity(Recipe recipe);
+   default RecipeEntity recipeToEntity(Recipe recipe, RecipeEntity recipeEntity){
+       recipeEntity.setInstruction(recipe.getInstruction());
+       recipeEntity.setType(recipe.getType());
+       recipeEntity.setName(recipe.getName());
+       recipeEntity.setNumberOfServings(recipe.getNumberOfServings());
+        return recipeEntity;
+    }
 
     Recipe entityToRecipe(RecipeEntity entity);
 
@@ -60,6 +64,7 @@ public interface RecipeConvertor {
         recipe.setType(recipeRequestDTO.getType().name());
         recipe.setNumberOfServings(recipeRequestDTO.getNumberOfServings());
         recipe.setName(recipeRequestDTO.getName());
+        recipe.setId(recipeRequestDTO.getId());
         return recipe;
     }
 }

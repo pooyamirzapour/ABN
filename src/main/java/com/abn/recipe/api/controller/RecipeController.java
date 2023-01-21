@@ -8,15 +8,7 @@ import com.abn.recipe.domain.service.recipe.RecipeService;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -40,15 +32,22 @@ public class RecipeController {
     @PatchMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "recipe.", nickname = "Update Recipe", notes = "User updates an existing recipe with ingredients")
-    public CreatedResponseDTO update(@Valid @RequestBody RecipeRequestDTO recipeRequestDTO) {
+    public CreatedResponseDTO update(@RequestBody RecipeRequestDTO recipeRequestDTO) {
         return new CreatedResponseDTO(recipeService.update(RecipeConvertor.INSTANCE.dtoToRecipe(recipeRequestDTO)));
     }
 
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "recipe.", nickname = "Get Recipe", notes = "User get a recipe by id")
-    public RecipeResponseDTO get(@Valid @PathVariable int id) {
+    public RecipeResponseDTO get(@PathVariable int id) {
         return RecipeConvertor.INSTANCE.recipeToDTO(recipeService.getById(id));
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ApiOperation(value = "recipe.", nickname = "Remove Recipe", notes = "User remove a recipe by id")
+    public void delete(@Valid @PathVariable int id) {
+        recipeService.delete(id);
     }
 
     @GetMapping()

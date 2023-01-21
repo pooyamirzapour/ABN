@@ -23,6 +23,10 @@ public class RecipeService {
         return recipeRepository.save(recipe);
     }
 
+    public void delete(int id) {
+         recipeRepository.delete(id);
+    }
+
     public int update(Recipe recipe) {
         if (recipe.getId() == 0) {
             throw new ABNServiceException("id not sent", ErrorCode.ID_NOT_SENT, HttpStatus.BAD_REQUEST);

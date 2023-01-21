@@ -2,6 +2,7 @@ package com.abn.recipe.repository.ingredient;
 
 import com.abn.recipe.repository.recipe.RecipeEntity;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.apache.logging.log4j.core.config.plugins.validation.constraints.NotBlank;
 import org.hibernate.annotations.CreationTimestamp;
@@ -25,6 +26,7 @@ import java.util.Set;
 @Table(name = "ingredients")
 @Getter
 @Setter
+@NoArgsConstructor
 public class IngredientEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,4 +47,8 @@ public class IngredientEntity {
     @UpdateTimestamp
     private LocalDateTime updatedDate;
 
+    public IngredientEntity(Integer id, String ingredient) {
+        this.id = id;
+        this.ingredient = ingredient;
+    }
 }

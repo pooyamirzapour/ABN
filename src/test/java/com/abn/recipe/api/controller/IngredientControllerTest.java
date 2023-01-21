@@ -50,18 +50,31 @@ class IngredientControllerTest {
     void getToken() {
         UserEntity userEntity = new UserEntity();
         userEntity.setPassword("123456");
-        userEntity.setUsername("pooya1");
+        userEntity.setUsername("John");
         userEntity = userDetailsService.save(userEntity);
         token = CryptoToken.generateToken(userEntity);
     }
 
-    @Test
-    void given_validUser_when_callPost_then_createIngredient() {
+    private HttpHeaders prepareHeader() {
         HttpHeaders headers = new HttpHeaders();
         headers.add(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         headers.add(AUTHORIZATION, BEARER + token);
+        return headers;
+    }
+
+    private Integer insertIngredientToDB(String paper) {
+        IngredientEntity ingredient = new IngredientEntity();
+        ingredient.setIngredient(paper);
+
+        IngredientEntity save = ingredientJpaRepository.save(ingredient);
+        return save.getId();
+    }
+
+    @Test
+    void given_validUser_when_callPost_then_createIngredient() {
+        HttpHeaders headers = prepareHeader();
         //given:
-        IngredientDTO ingredient = new IngredientDTO("salt");
+        IngredientDTO ingredient = new IngredientDTO("Cucumber");
         HttpEntity<?> entity = new HttpEntity<>(ingredient, headers);
         String uri = String.format("http://localhost:%s/ingredient", localPort);
 
@@ -75,21 +88,14 @@ class IngredientControllerTest {
 
     @Test
     void given_validUser_when_callDelete_then_deleteIngredient() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-        headers.add(AUTHORIZATION, BEARER + token);
+        HttpHeaders headers = prepareHeader();
         //given:
-        IngredientEntity ingredient = new IngredientEntity();
-        ingredient.setIngredient("salt");
-
-        IngredientEntity save = ingredientJpaRepository.save(ingredient);
-        Integer id = save.getId();
+        Integer id = insertIngredientToDB("Onion");
         HttpEntity<?> entity = new HttpEntity<>(null, headers);
         String uri = String.format("http://localhost:%s/ingredient/" + id, localPort);
 
         //when:
-        ResponseEntity<Void> response =rest.exchange(uri, HttpMethod.DELETE, entity, void.class);
-
+        ResponseEntity<Void> response = rest.exchange(uri, HttpMethod.DELETE, entity, void.class);
 
         //then:
         Assertions.assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
@@ -97,21 +103,32 @@ class IngredientControllerTest {
 
     @Test
     void given_validUser_when_callGetById_then_getIngredient() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
-        headers.add(AUTHORIZATION, BEARER + token);
+        HttpHeaders headers = prepareHeader();
         //given:
-        IngredientEntity ingredient = new IngredientEntity();
-        ingredient.setIngredient("salt");
-
-        IngredientEntity save = ingredientJpaRepository.save(ingredient);
-        Integer id = save.getId();
+        Integer id = insertIngredientToDB("Date");
         HttpEntity<?> entity = new HttpEntity<>(null, headers);
         String uri = String.format("http://localhost:%s/ingredient/" + id, localPort);
 
         //when:
-        ResponseEntity<IngredientDTO> response =rest.exchange(uri, HttpMethod.GET, entity, IngredientDTO.class);
+        ResponseEntity<IngredientDTO> response = rest.exchange(uri, HttpMethod.GET, entity, IngredientDTO.class);
 
+        //then:
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+
+    @Test
+    void given_validUser_when_callGetAll_then_getAllIngredient() {
+        HttpHeaders headers = prepareHeader();
+        //given:
+        IngredientEntity ingredient = new IngredientEntity();
+        ingredient.setIngredient("Potato");
+
+        ingredientJpaRepository.save(ingredient);
+        HttpEntity<?> entity = new HttpEntity<>(null, headers);
+        String uri = String.format("http://localhost:%s/ingredient/", localPort);
+
+        //when:
+        ResponseEntity<IngredientDTO> response = rest.exchange(uri, HttpMethod.GET, entity, IngredientDTO.class);
 
         //then:
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
