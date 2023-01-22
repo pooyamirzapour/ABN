@@ -6,6 +6,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
+/**
+ * Basic crud operations
+ */
 @Service
 @AllArgsConstructor
 public class IngredientService {

@@ -5,7 +5,6 @@ import com.abn.recipe.api.model.recipe.RecipeResponseDTO;
 import com.abn.recipe.api.model.recipe.RecipeTypeEnum;
 import com.abn.recipe.domain.model.Ingredient;
 import com.abn.recipe.domain.model.Recipe;
-import com.abn.recipe.repository.ingredient.IngredientEntity;
 import com.abn.recipe.repository.recipe.RecipeEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -16,7 +15,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * A transfomrer responsible for the conversion of Recipe
+ * A transformer responsible for the conversion of Recipe
  */
 @Mapper
 public interface RecipeConvertor {

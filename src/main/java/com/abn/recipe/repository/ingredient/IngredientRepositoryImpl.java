@@ -6,6 +6,7 @@ import com.abn.recipe.common.transformer.IngredientConverter;
 import com.abn.recipe.domain.model.Ingredient;
 import com.abn.recipe.domain.service.ingredient.IngredientRepository;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Repository;
 
@@ -14,6 +15,7 @@ import java.util.Set;
 
 @Repository
 @AllArgsConstructor
+@Slf4j
 public class IngredientRepositoryImpl implements IngredientRepository {
 
     private final IngredientJpaRepository ingredientJpaRepository;
@@ -42,6 +44,7 @@ public class IngredientRepositoryImpl implements IngredientRepository {
         if (found.isPresent()) {
             return IngredientConverter.INSTANCE.entityToIngredient(found.get());
         }
+        log.error("Ingredient not found");
         throw new ABNServiceException("Ingredient not found", ErrorCode.INGREDIENT_NOT_FOUND, HttpStatus.NOT_FOUND);
 
     }

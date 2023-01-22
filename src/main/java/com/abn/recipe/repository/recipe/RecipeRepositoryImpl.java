@@ -3,19 +3,27 @@ package com.abn.recipe.repository.recipe;
 import com.abn.recipe.common.exception.ABNServiceException;
 import com.abn.recipe.common.exception.ErrorCode;
 import com.abn.recipe.common.transformer.RecipeConvertor;
+import com.abn.recipe.common.transformer.SearchConverter;
 import com.abn.recipe.domain.model.Recipe;
+import com.abn.recipe.domain.model.SearchQueryServiceRequest;
+import com.abn.recipe.domain.model.SearchQueryServiceResponse;
 import com.abn.recipe.domain.service.recipe.RecipeRepository;
 import com.abn.recipe.repository.ingredient.IngredientEntity;
 import com.abn.recipe.repository.ingredient.IngredientJpaRepository;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 @AllArgsConstructor
+@Slf4j
 public class RecipeRepositoryImpl implements RecipeRepository {
 
     private final RecipeJpaRepository recipeJpaRepository;
@@ -23,8 +31,11 @@ public class RecipeRepositoryImpl implements RecipeRepository {
 
     public IngredientEntity findById(int id) {
         return ingredientJpaRepository.findById(id)
-                .orElseThrow(() -> new ABNServiceException("ingredient not found", ErrorCode.INGREDIENT_NOT_FOUND,
-                        HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> {
+                    log.error("ingredient not found");
+                    return new ABNServiceException("ingredient not found", ErrorCode.INGREDIENT_NOT_FOUND,
+                            HttpStatus.NOT_FOUND);
+                });
     }
 
     @Override
@@ -63,9 +74,27 @@ public class RecipeRepositoryImpl implements RecipeRepository {
     }
 
     @Override
-    public List<Recipe> query(String[] include, String[] exclude, String[] instruction, String[] noServings,
-            String[] type) {
-        return RecipeConvertor.INSTANCE.recipeEntitiesToRecipes(
-                recipeJpaRepository.query(null, null, null, 1, null));
+    public List<SearchQueryServiceResponse> query(SearchQueryServiceRequest req) {
+        List<Integer> excludes = null;
+        if (req.getExcludes() != null) {
+            excludes = ingredientJpaRepository.findByIngredientIn(req.getExcludes())
+                    .stream()
+                    .map(IngredientEntity::getId).collect(Collectors.toList());
+        }
+        List<Integer> includes = null;
+        if (req.getIncludes() != null) {
+            includes = ingredientJpaRepository.findByIngredientIn(req.getIncludes())
+                    .stream()
+                    .map(IngredientEntity::getId).collect(Collectors.toList());
+        }
+
+        Pageable pageable = PageRequest.of(req.getPage(), req.getSize());
+
+        List<SearchQueryEntityModel> query =
+                recipeJpaRepository.query(req.getInstruction(), req.getNoServings(), req.getType(), excludes, includes,
+                        pageable);
+        return SearchConverter.INSTANCE.queryEntityToQueryService(query);
+
     }
+
 }

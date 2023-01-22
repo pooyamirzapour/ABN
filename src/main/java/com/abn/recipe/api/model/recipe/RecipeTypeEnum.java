@@ -2,6 +2,9 @@ package com.abn.recipe.api.model.recipe;
 
 import java.util.Arrays;
 
+/**
+ * Recipe types
+ */
 public enum RecipeTypeEnum {
     VEGETARIAN("vegetarian"),
     VEGAN("vegan"),

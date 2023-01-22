@@ -1,20 +1,24 @@
 package com.abn.recipe.domain.service.recipe;
 
-import com.abn.recipe.api.model.recipe.RecipeResponseDTO;
 import com.abn.recipe.common.exception.ABNServiceException;
 import com.abn.recipe.common.exception.ErrorCode;
-import com.abn.recipe.common.transformer.RecipeConvertor;
 import com.abn.recipe.domain.model.Recipe;
+import com.abn.recipe.domain.model.SearchQueryServiceRequest;
+import com.abn.recipe.domain.model.SearchQueryServiceResponse;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
+/**
+ * Basic crud operations
+ */
 @Service
 @AllArgsConstructor
+@Slf4j
 public class RecipeService {
 
     private final RecipeRepository recipeRepository;
@@ -24,16 +28,18 @@ public class RecipeService {
     }
 
     public void delete(int id) {
-         recipeRepository.delete(id);
+        recipeRepository.delete(id);
     }
 
     public int update(Recipe recipe) {
         if (recipe.getId() == 0) {
+            log.error("id not sent");
             throw new ABNServiceException("id not sent", ErrorCode.ID_NOT_SENT, HttpStatus.BAD_REQUEST);
         }
 
         int update = recipeRepository.update(recipe);
         if (update == -1) {
+            log.error("id not sent");
             throw new ABNServiceException("id is not sent", ErrorCode.RECIPE_NOT_FOUND,
                     HttpStatus.UNPROCESSABLE_ENTITY);
         }
@@ -43,19 +49,16 @@ public class RecipeService {
     public Recipe getById(int id) {
         Optional<Recipe> recipe = recipeRepository.get(id);
         if (recipe.isEmpty()) {
+            log.error("recipe not found");
             throw new ABNServiceException("recipe not found", ErrorCode.RECIPE_NOT_FOUND, HttpStatus.NOT_FOUND);
         }
         return recipe.get();
     }
 
-    public List<RecipeResponseDTO> search(Map<String, String[]> allRequestParams, int page, int size) {
-        String[] include = allRequestParams.get("include");
-        String[] exclude = allRequestParams.get("exclude");
-        String[] noServings = allRequestParams.get("noserving");
-        String[] type = allRequestParams.get("type");
-        String[] instruction = allRequestParams.get("instruction");
-
-        return RecipeConvertor.INSTANCE.recipesToDTOs(recipeRepository.query(include,exclude,instruction,noServings,type));
-
+    public List<SearchQueryServiceResponse> search(SearchQueryServiceRequest searchQueryServiceRequest) {
+        return recipeRepository.query(searchQueryServiceRequest);
     }
+
+
+
 }

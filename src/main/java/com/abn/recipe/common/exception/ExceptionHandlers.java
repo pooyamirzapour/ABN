@@ -7,10 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.WebRequest;
 
 import static com.abn.recipe.common.config.MetricConstant.ABN_EXCEPTION;
 import static com.abn.recipe.common.exception.ErrorCode.DATABASE_EXCEPTION;
@@ -38,6 +36,8 @@ public class ExceptionHandlers {
 
         meterRegistry.counter(ABN_EXCEPTION,
                 Tags.of("ErrorCode", exception.getErrorCode().name())).increment();
+
+        log.error(exception.getMessage());
 
         return new ResponseEntity<>(new ErrorMsg(exception.getErrorCode().getValue(), exception.getMessage()),
                 exception.getHttpStatus());

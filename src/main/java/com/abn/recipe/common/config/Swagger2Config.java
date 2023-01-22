@@ -29,7 +29,7 @@ public class Swagger2Config {
 
     private ApiInfo getApiInfo() {
         return new ApiInfo(
-                "Movie",
+                "Recipe",
                 "This application is a Java Web Application running ",
                 "1.0.0",
                 "",

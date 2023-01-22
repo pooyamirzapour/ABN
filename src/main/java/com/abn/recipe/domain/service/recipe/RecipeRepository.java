@@ -1,7 +1,8 @@
 package com.abn.recipe.domain.service.recipe;
 
 import com.abn.recipe.domain.model.Recipe;
-
+import com.abn.recipe.domain.model.SearchQueryServiceRequest;
+import com.abn.recipe.domain.model.SearchQueryServiceResponse;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +17,5 @@ public interface RecipeRepository {
 
     void delete(int id);
 
-
-    List<Recipe> query(String[] include, String[] exclude, String[] instruction, String[] noServings, String[] type);
+    List<SearchQueryServiceResponse> query(SearchQueryServiceRequest searchQueryServiceRequest);
 }

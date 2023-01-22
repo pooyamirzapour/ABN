@@ -5,6 +5,7 @@ import com.abn.recipe.common.exception.ABNServiceException;
 import com.abn.recipe.common.exception.ErrorCode;
 import com.abn.recipe.repository.user.UserJpaRepository;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,7 @@ import java.util.Objects;
  * @author Pooya Mirzapour (pooyamirzapour@gmail.com)
  */
 @Service
+@Slf4j
 public class JwtUserDetailsService implements UserDetailsService {
     public static final int USER_DAYS_VALIDITY = 1;
     @Autowired
@@ -56,6 +58,7 @@ public class JwtUserDetailsService implements UserDetailsService {
     public UserEntity loadUserEntityByUsername(String username) {
         UserEntity user = userJpaRepository.findByUsername(username);
         if (Objects.isNull(user)) {
+            log.error("User not found with username");
             throw new UsernameNotFoundException("User not found with username: " + username);
         }
         return user;
@@ -73,6 +76,7 @@ public class JwtUserDetailsService implements UserDetailsService {
         try {
             newUser = userJpaRepository.save(newUser);
         } catch (DataIntegrityViolationException exception) {
+            log.error("User registered before");
             throw new ABNServiceException("User registered before", ErrorCode.USER_REGISTER_BEFORE,
                     HttpStatus.BAD_REQUEST);
         }

@@ -76,7 +76,7 @@ class IngredientControllerTest {
         //given:
         IngredientDTO ingredient = new IngredientDTO("Cucumber");
         HttpEntity<?> entity = new HttpEntity<>(ingredient, headers);
-        String uri = String.format("http://localhost:%s/ingredient", localPort);
+        String uri = String.format("http://localhost:%s/ingredients", localPort);
 
         //when:
         ResponseEntity<CreatedResponseDTO> response =
@@ -92,7 +92,7 @@ class IngredientControllerTest {
         //given:
         Integer id = insertIngredientToDB("Onion");
         HttpEntity<?> entity = new HttpEntity<>(null, headers);
-        String uri = String.format("http://localhost:%s/ingredient/" + id, localPort);
+        String uri = String.format("http://localhost:%s/ingredients/" + id, localPort);
 
         //when:
         ResponseEntity<Void> response = rest.exchange(uri, HttpMethod.DELETE, entity, void.class);
@@ -107,7 +107,7 @@ class IngredientControllerTest {
         //given:
         Integer id = insertIngredientToDB("Date");
         HttpEntity<?> entity = new HttpEntity<>(null, headers);
-        String uri = String.format("http://localhost:%s/ingredient/" + id, localPort);
+        String uri = String.format("http://localhost:%s/ingredients/" + id, localPort);
 
         //when:
         ResponseEntity<IngredientDTO> response = rest.exchange(uri, HttpMethod.GET, entity, IngredientDTO.class);
@@ -125,7 +125,7 @@ class IngredientControllerTest {
 
         ingredientJpaRepository.save(ingredient);
         HttpEntity<?> entity = new HttpEntity<>(null, headers);
-        String uri = String.format("http://localhost:%s/ingredient/", localPort);
+        String uri = String.format("http://localhost:%s/ingredients/", localPort);
 
         //when:
         ResponseEntity<IngredientDTO> response = rest.exchange(uri, HttpMethod.GET, entity, IngredientDTO.class);

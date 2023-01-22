@@ -12,6 +12,8 @@ import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class RecipeServiceTest {
@@ -73,5 +75,14 @@ class RecipeServiceTest {
         Recipe byId = recipeService.getById(1);
         Assertions.assertEquals(1, byId.getId());
     }
+
+    @Test
+    void test_delete_is_working() {
+        RecipeService recipeService = new RecipeService(recipeRepository);
+         recipeService.delete(1);
+        verify(recipeRepository, times(1)).delete(1);
+    }
+
+
 
 }

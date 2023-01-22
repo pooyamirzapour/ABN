@@ -3,6 +3,7 @@ package com.abn.recipe.api.controller;
 import com.abn.recipe.api.model.recipe.CreatedResponseDTO;
 import com.abn.recipe.api.model.recipe.RecipeRequestDTO;
 import com.abn.recipe.api.model.recipe.RecipeTypeEnum;
+import com.abn.recipe.domain.model.SearchResponseDTO;
 import com.abn.recipe.repository.ingredient.IngredientEntity;
 import com.abn.recipe.repository.ingredient.IngredientJpaRepository;
 import com.abn.recipe.repository.recipe.RecipeEntity;
@@ -10,6 +11,8 @@ import com.abn.recipe.repository.recipe.RecipeJpaRepository;
 import com.abn.recipe.repository.user.UserEntity;
 import com.abn.recipe.security.service.JwtUserDetailsService;
 import com.abn.recipe.security.utility.CryptoToken;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -38,19 +41,14 @@ class RecipeControllerTest {
 
     @LocalServerPort
     private int localPort;
-
     @Autowired
     public TestRestTemplate rest;
-
     @Autowired
     private JwtUserDetailsService userDetailsService;
-
     @Autowired
     private IngredientJpaRepository ingredientJpaRepository;
-
     @Autowired
     private RecipeJpaRepository recipeJpaRepository;
-
     public static final String CONTENT_TYPE = "Content-Type";
     public static final String AUTHORIZATION = "Authorization";
     public static final String BEARER = "Bearer ";
@@ -65,7 +63,12 @@ class RecipeControllerTest {
         userEntity = userDetailsService.save(userEntity);
         token = CryptoToken.generateToken(userEntity);
         headers = prepareHeader();
+    }
 
+    @AfterAll
+    void afterAll() {
+       recipeJpaRepository.deleteAll();
+       ingredientJpaRepository.deleteAll();
     }
 
     private HttpHeaders prepareHeader() {
@@ -73,6 +76,23 @@ class RecipeControllerTest {
         headers.add(CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         headers.add(AUTHORIZATION, BEARER + token);
         return headers;
+    }
+
+    private RecipeEntity saveRecipe(Set<IngredientEntity> ingredients, String name) {
+        RecipeEntity recipe =
+                new RecipeEntity();
+        recipe.setIngredients(ingredients);
+        recipe.setName(name);
+        recipe.setNumberOfServings(1);
+        recipe.setType(RecipeTypeEnum.VEGETARIAN.name());
+        recipe.setInstruction("Oven");
+        return recipeJpaRepository.save(recipe);
+    }
+
+    private IngredientEntity saveIngredient(String name) {
+        IngredientEntity ingredient = new IngredientEntity();
+        ingredient.setIngredient(name);
+        return ingredientJpaRepository.save(ingredient);
     }
 
     @Test
@@ -88,7 +108,7 @@ class RecipeControllerTest {
                 new RecipeRequestDTO("Pizza", 1, ingredients, "oven", RecipeTypeEnum.VEGETARIAN);
 
         HttpEntity<?> entity = new HttpEntity<>(recipeRequestDTO, headers);
-        String uri = String.format("http://localhost:%s/recipe", localPort);
+        String uri = String.format("http://localhost:%s/recipes", localPort);
 
         //when:
         ResponseEntity<CreatedResponseDTO> response =
@@ -101,7 +121,7 @@ class RecipeControllerTest {
     @Test
     void given_validUser_when_callDelete_then_deleteRecipe() {
 
-        IngredientEntity save = saveIngredient("paper");
+        IngredientEntity save = saveIngredient("pepper");
 
         Set<IngredientEntity> ingredients = new HashSet<>();
         ingredients.add(save);
@@ -109,7 +129,7 @@ class RecipeControllerTest {
         RecipeEntity recipeEntity = saveRecipe(ingredients, "Hamburger");
 
         HttpEntity<?> entity = new HttpEntity<>(null, headers);
-        String uri = String.format("http://localhost:%s/recipe/" + recipeEntity.getId(), localPort);
+        String uri = String.format("http://localhost:%s/recipes/" + recipeEntity.getId(), localPort);
 
         //when:
         ResponseEntity<CreatedResponseDTO> response =
@@ -119,16 +139,7 @@ class RecipeControllerTest {
         Assertions.assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());
     }
 
-    private RecipeEntity saveRecipe(Set<IngredientEntity> ingredients, String name) {
-        RecipeEntity recipe =
-                new RecipeEntity();
-        recipe.setIngredients(ingredients);
-        recipe.setName(name);
-        recipe.setNumberOfServings(1);
-        recipe.setType(RecipeTypeEnum.VEGETARIAN.name());
-        recipe.setInstruction("Oven");
-        return recipeJpaRepository.save(recipe);
-    }
+
 
     @Test
     void given_validUser_when_callGetById_then_getRecipe() {
@@ -140,7 +151,7 @@ class RecipeControllerTest {
 
         RecipeEntity recipe = saveRecipe(ingredients, "Chicken");
         HttpEntity<?> entity = new HttpEntity<>(null, headers);
-        String uri = String.format("http://localhost:%s/recipe/" + recipe.getId(), localPort);
+        String uri = String.format("http://localhost:%s/recipes/" + recipe.getId(), localPort);
 
         //when:
         ResponseEntity<CreatedResponseDTO> response =
@@ -150,12 +161,6 @@ class RecipeControllerTest {
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
-    private IngredientEntity saveIngredient(String salt) {
-        IngredientEntity ingredient = new IngredientEntity();
-        ingredient.setIngredient(salt);
-        IngredientEntity save = ingredientJpaRepository.save(ingredient);
-        return save;
-    }
 
     @Test
     void given_validUser_when_callUpdate_then_returnRecipe() {
@@ -175,7 +180,7 @@ class RecipeControllerTest {
                         RecipeTypeEnum.VEGAN);
 
         HttpEntity<?> entity = new HttpEntity<>(recipeRequestDTO, headers);
-        String uri = String.format("http://localhost:%s/recipe/", localPort);
+        String uri = String.format("http://localhost:%s/recipes/", localPort);
 
         //when:
         ResponseEntity<CreatedResponseDTO> response =
@@ -184,5 +189,31 @@ class RecipeControllerTest {
         //then:
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
     }
+
+    @Test
+    void given_validUser_when_callSearch_then_returnResult() {
+
+        IngredientEntity ingredient1 = saveIngredient("Cucumber2");
+        IngredientEntity ingredient2 = saveIngredient("Milk");
+         saveIngredient("Butter");
+
+        Set<IngredientEntity> ingredients = new HashSet<>();
+        ingredients.add(ingredient1);
+        ingredients.add(ingredient2);
+
+         saveRecipe(ingredients, "Sushi");
+
+
+        HttpEntity<?> entity = new HttpEntity<>(null, headers);
+        String uri = String.format("http://localhost:%s/recipes?page=0&size=1&includes=Cucumber&excludes=Butter&noserving=1&instruction=oven&type=VEGETARIAN", localPort);
+
+        //when:
+        ResponseEntity<SearchResponseDTO> response =
+                rest.exchange(uri, HttpMethod.GET, entity, SearchResponseDTO.class);
+
+        //then:
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        //TODO: add more assertions
+        }
 
 }
