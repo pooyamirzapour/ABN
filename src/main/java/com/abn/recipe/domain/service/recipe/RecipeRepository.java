@@ -17,5 +17,7 @@ public interface RecipeRepository {
 
     void delete(int id);
 
-    List<SearchQueryServiceResponse> query(SearchQueryServiceRequest searchQueryServiceRequest);
+    List<SearchQueryServiceResponse> query(SearchQueryServiceRequest req, List<Integer> excludes, List<Integer> includes);
+
+     List<Integer> findByIngredientIn(List<String> req);
 }

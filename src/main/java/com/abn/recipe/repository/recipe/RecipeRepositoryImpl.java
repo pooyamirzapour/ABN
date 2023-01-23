@@ -73,18 +73,23 @@ public class RecipeRepositoryImpl implements RecipeRepository {
         recipeJpaRepository.deleteById(id);
     }
 
+    /**
+     * First we extract ingredient Ids based on the names, then we call the query, if
+     *
+     * @param req
+     * @return result list
+     */
     @Override
-    public List<SearchQueryServiceResponse> query(SearchQueryServiceRequest req) {
-        List<Integer> excludes = ingredientsToIds(req.getExcludes());
-        List<Integer> includes = ingredientsToIds(req.getIncludes());
+    public List<SearchQueryServiceResponse> query(SearchQueryServiceRequest req, List<Integer> excludes, List<Integer> includes) {
+
 
         Pageable pageable = PageRequest.of(req.getPage(), req.getSize());
 
         List<SearchQueryEntityModel> query;
-        if (excludes ==null || excludes.size() == 0) {
+        if (excludes == null || excludes.size() == 0) {
             query =
                     recipeJpaRepository.queryWithoutExclusion(req.getInstruction(), req.getNoServings(), req.getType(),
-                             includes, pageable);
+                            includes, pageable);
         } else {
             query =
                     recipeJpaRepository.query(req.getInstruction(), req.getNoServings(), req.getType(), excludes,
@@ -95,7 +100,8 @@ public class RecipeRepositoryImpl implements RecipeRepository {
 
     }
 
-    private List<Integer> ingredientsToIds(List<String> req) {
+    @Override
+    public List<Integer> findByIngredientIn(List<String> req) {
         List<Integer> Ids = null;
         if (req != null) {
             Ids = ingredientJpaRepository.findByIngredientIn(req)
@@ -109,5 +115,7 @@ public class RecipeRepositoryImpl implements RecipeRepository {
         }
         return Ids;
     }
+
+
 
 }

@@ -56,9 +56,23 @@ public class RecipeService {
     }
 
     public List<SearchQueryServiceResponse> search(SearchQueryServiceRequest searchQueryServiceRequest) {
-        return recipeRepository.query(searchQueryServiceRequest);
+        List<Integer> excludes = ingredientsToIds(searchQueryServiceRequest.getExcludes());
+        List<Integer> includes = ingredientsToIds(searchQueryServiceRequest.getIncludes());
+        return recipeRepository.query(searchQueryServiceRequest, excludes, includes);
     }
 
+    private List<Integer> ingredientsToIds(List<String> req) {
+        List<Integer> Ids = null;
+        if (req != null) {
+            Ids = recipeRepository.findByIngredientIn(req);
 
+            if (req.size() != Ids.size() || Ids.size() == 0) {
+                log.error("ingredient not found");
+                throw new ABNServiceException("ingredient not found", ErrorCode.INGREDIENT_NOT_FOUND,
+                        HttpStatus.NOT_FOUND);
+            }
+        }
+        return Ids;
+    }
 
 }
