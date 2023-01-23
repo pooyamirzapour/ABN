@@ -1,6 +1,7 @@
 package com.abn.recipe.api.controller;
 
 import com.abn.recipe.api.model.ingredient.IngredientDTO;
+import com.abn.recipe.api.model.ingredient.IngredientResponseDTO;
 import com.abn.recipe.api.model.recipe.CreatedResponseDTO;
 import com.abn.recipe.common.transformer.IngredientConverter;
 import com.abn.recipe.domain.service.ingredient.IngredientService;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/ingredients")
@@ -50,9 +52,9 @@ public class IngredientController {
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "get a set of ingredient.", nickname = "Get all ingredients", notes = "User get all ingredients")
-    public void getAll() {
+    public IngredientResponseDTO getAll() {
         log.info("User get all ingredients");
-        ingredientService.getAll();
+        return new IngredientResponseDTO( IngredientConverter.INSTANCE.ingredientsToDTOs(ingredientService.getAll()));
     }
 
     @GetMapping("/{id}")

@@ -1,6 +1,7 @@
 package com.abn.recipe.api.controller;
 
 import com.abn.recipe.api.model.ingredient.IngredientDTO;
+import com.abn.recipe.api.model.ingredient.IngredientResponseDTO;
 import com.abn.recipe.api.model.recipe.CreatedResponseDTO;
 import com.abn.recipe.repository.ingredient.IngredientEntity;
 import com.abn.recipe.repository.ingredient.IngredientJpaRepository;
@@ -128,7 +129,7 @@ class IngredientControllerTest {
         String uri = String.format("http://localhost:%s/ingredients/", localPort);
 
         //when:
-        ResponseEntity<IngredientDTO> response = rest.exchange(uri, HttpMethod.GET, entity, IngredientDTO.class);
+        ResponseEntity<IngredientResponseDTO> response = rest.exchange(uri, HttpMethod.GET, entity, IngredientResponseDTO.class);
 
         //then:
         Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());

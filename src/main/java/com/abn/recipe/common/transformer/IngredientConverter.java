@@ -19,6 +19,8 @@ public interface IngredientConverter {
     Ingredient dtoToIngredient(IngredientDTO recipeRequestDTO);
 
     IngredientDTO ingredientToDTO(Ingredient ingredient);
+
+    Set<IngredientDTO> ingredientsToDTOs(Set<Ingredient> ingredient);
     Ingredient entityToIngredient(IngredientEntity ingredient);
 
     IngredientEntity ingredientToEntity(Ingredient ingredient);
