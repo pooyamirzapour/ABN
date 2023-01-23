@@ -75,28 +75,8 @@ public class RecipeRepositoryImpl implements RecipeRepository {
 
     @Override
     public List<SearchQueryServiceResponse> query(SearchQueryServiceRequest req) {
-        List<Integer> excludes = null;
-        if (req.getExcludes() != null) {
-            excludes = ingredientJpaRepository.findByIngredientIn(req.getExcludes())
-                    .stream()
-                    .map(IngredientEntity::getId).collect(Collectors.toList());
-            if (req.getExcludes().size() != excludes.size() || excludes.size() == 0) {
-                log.error("ingredient not found");
-                throw new ABNServiceException("ingredient not found", ErrorCode.INGREDIENT_NOT_FOUND,
-                        HttpStatus.NOT_FOUND);
-            }
-        }
-        List<Integer> includes = null;
-        if (req.getIncludes() != null) {
-            includes = ingredientJpaRepository.findByIngredientIn(req.getIncludes())
-                    .stream()
-                    .map(IngredientEntity::getId).collect(Collectors.toList());
-            if (req.getIncludes().size() != includes.size() || includes.size() == 0) {
-                log.error("ingredient not found");
-                throw new ABNServiceException("ingredient not found", ErrorCode.INGREDIENT_NOT_FOUND,
-                        HttpStatus.NOT_FOUND);
-            }
-        }
+        List<Integer> excludes = ingredientsToIds(req.getExcludes());
+        List<Integer> includes = ingredientsToIds(req.getIncludes());
 
         Pageable pageable = PageRequest.of(req.getPage(), req.getSize());
 
@@ -105,6 +85,21 @@ public class RecipeRepositoryImpl implements RecipeRepository {
                         pageable);
         return SearchConverter.INSTANCE.queryEntityToQueryService(query);
 
+    }
+
+    private List<Integer> ingredientsToIds(List<String> req) {
+        List<Integer> Ids = null;
+        if (req != null) {
+            Ids = ingredientJpaRepository.findByIngredientIn(req)
+                    .stream()
+                    .map(IngredientEntity::getId).collect(Collectors.toList());
+            if (req.size() != Ids.size() || Ids.size() == 0) {
+                log.error("ingredient not found");
+                throw new ABNServiceException("ingredient not found", ErrorCode.INGREDIENT_NOT_FOUND,
+                        HttpStatus.NOT_FOUND);
+            }
+        }
+        return Ids;
     }
 
 }
