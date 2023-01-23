@@ -205,7 +205,7 @@ class RecipeControllerTest {
 
 
         HttpEntity<?> entity = new HttpEntity<>(null, headers);
-        String uri = String.format("http://localhost:%s/recipes?page=0&size=1&includes=Cucumber&excludes=Butter&noserving=1&instruction=oven&type=VEGETARIAN", localPort);
+        String uri = String.format("http://localhost:%s/recipes?page=0&size=1&includes=Cucumber2&excludes=Butter&noserving=1&instruction=oven&type=VEGETARIAN", localPort);
 
         //when:
         ResponseEntity<SearchResponseDTO> response =
