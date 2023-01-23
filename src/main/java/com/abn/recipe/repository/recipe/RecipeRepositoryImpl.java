@@ -74,9 +74,10 @@ public class RecipeRepositoryImpl implements RecipeRepository {
     }
 
     /**
-     * First we extract ingredient Ids based on the names, then we call the query, if
-     *
-     * @param req
+     * First we extract Ids based on names, then call the query.
+     * @param req - search params
+     * @param excludes - ingredients which should be excluded
+     * @param includes - ingredients which should be included
      * @return result list
      */
     @Override
