@@ -31,7 +31,7 @@ public class RecipeRequestDTO {
     private String name;
 
     @NotNull(message = NUMBER_OF_SERVINGS_IS_REQUIRED)
-    private int numberOfServings;
+    private Integer numberOfServings;
 
     @NotNull(message = INGREDIENT_IDS_IS_REQUIRED)
     @Size(min=1)
