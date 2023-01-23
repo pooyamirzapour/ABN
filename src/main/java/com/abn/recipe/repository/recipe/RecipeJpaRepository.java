@@ -1,11 +1,14 @@
 package com.abn.recipe.repository.recipe;
 
+import io.micrometer.core.annotation.Timed;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+
+import static com.abn.recipe.common.config.MetricConstant.SEARCH_QUERY;
 
 public interface RecipeJpaRepository extends CrudRepository<RecipeEntity, Integer> {
 
@@ -17,7 +20,7 @@ public interface RecipeJpaRepository extends CrudRepository<RecipeEntity, Intege
      * @param type        - recipe type
      * @return - search result
      */
-
+    @Timed(value = SEARCH_QUERY)
     @Query(value =
             " select finaltbl.name ,  finaltbl.type, finaltbl.number_of_servings as no   , GROUP_CONCAT(ingredient) as ingredient , finaltbl.instruction "
                     + " from(  select distinct mytbl.instruction, mytbl.name, mytbl.recipe_id , mytbl.type , mytbl.Number_of_servings, recipe_ingredient.ingredient_id from (select distinct * from "
@@ -30,8 +33,7 @@ public interface RecipeJpaRepository extends CrudRepository<RecipeEntity, Intege
             , nativeQuery = true)
     List<SearchQueryEntityModel> query(@Param("instruction") String instruction, @Param("noServing") Integer noServing,
             @Param("type") String type, @Param("exclusion") List<Integer> exclusion,
-            @Param("inclusion") List<Integer> inclusion , Pageable pageable);
-
+            @Param("inclusion") List<Integer> inclusion, Pageable pageable);
 
 }
 

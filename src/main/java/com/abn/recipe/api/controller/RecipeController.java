@@ -27,7 +27,7 @@ public class RecipeController {
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "recipe.", nickname = "Create Recipe", notes = "User creates a new recipe with ingredients")
-    public CreatedResponseDTO create(@RequestBody RecipeRequestDTO recipeRequestDTO) {
+    public CreatedResponseDTO create(@Valid @RequestBody RecipeRequestDTO recipeRequestDTO) {
         log.info("User creates a new recipe with ingredients");
         return new CreatedResponseDTO(recipeService.save(RecipeConvertor.INSTANCE.dtoToRecipe(recipeRequestDTO)));
     }
@@ -51,7 +51,7 @@ public class RecipeController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @ApiOperation(value = "recipe.", nickname = "Remove Recipe", notes = "User remove a recipe by id")
-    public void delete(@Valid @PathVariable int id) {
+    public void delete(@PathVariable int id) {
         log.info("User remove a recipe by id");
         recipeService.delete(id);
     }

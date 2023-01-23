@@ -61,3 +61,5 @@ Or you can use this form: **http://localhost:8080/recipes?page=0&size=1&includes
 H2 console **http://localhost:8086/h2**
 
 Swagger API by this link: **http://localhost:8086/swagger-ui.html**
+
+A Postman collection is placed in the project root (**ABN.postman_collection.json**)

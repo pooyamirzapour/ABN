@@ -2,7 +2,7 @@
 This project implements some APIs for user registration, and recipe management.
 
 ### Approach
-Regarding the requirement (being production ready) in this solution basic cross-cutting concerns (Security, Logging, Monitoring) have been implemented.
+Regarding the requirement (being production ready) in this solution basic cross-cutting concerns: Security(Spring Security), Logging(Log4J), Monitoring(Micrometer) have been implemented.
 For the security cases, with the help of JWT, Register use cases has been implemented.
 
 

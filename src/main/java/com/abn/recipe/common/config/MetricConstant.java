@@ -7,7 +7,7 @@ package com.abn.recipe.common.config;
  */
 public class MetricConstant {
     public static final String ABN_EXCEPTION = "abn.exception";
-    public static final String FIND_BY_TITLE = "find.by.title";
+    public static final String SEARCH_QUERY = "search.query";
     public static final String FIND_BY_USERNAME = "find.by.username";
 
 }

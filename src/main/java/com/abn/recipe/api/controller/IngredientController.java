@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/ingredients")
 @AllArgsConstructor
@@ -30,7 +32,7 @@ public class IngredientController {
     @PostMapping()
     @ResponseStatus(HttpStatus.CREATED)
     @ApiOperation(value = "create an ingredient.", nickname = "Create an ingredient", notes = "User creates a new ingredient")
-    public CreatedResponseDTO create(@RequestBody IngredientDTO ingredientDTO) {
+    public CreatedResponseDTO create(@Valid @RequestBody IngredientDTO ingredientDTO) {
         log.info("User creates a new ingredient");
         return new CreatedResponseDTO(
                 ingredientService.save(IngredientConverter.INSTANCE.dtoToIngredient(ingredientDTO)));
