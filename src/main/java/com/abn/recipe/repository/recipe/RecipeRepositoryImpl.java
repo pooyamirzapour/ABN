@@ -80,9 +80,17 @@ public class RecipeRepositoryImpl implements RecipeRepository {
 
         Pageable pageable = PageRequest.of(req.getPage(), req.getSize());
 
-        List<SearchQueryEntityModel> query =
-                recipeJpaRepository.query(req.getInstruction(), req.getNoServings(), req.getType(), excludes, includes,
-                        pageable);
+        List<SearchQueryEntityModel> query;
+        if (excludes ==null || excludes.size() == 0) {
+            query =
+                    recipeJpaRepository.queryWithoutExclusion(req.getInstruction(), req.getNoServings(), req.getType(),
+                             includes, pageable);
+        } else {
+            query =
+                    recipeJpaRepository.query(req.getInstruction(), req.getNoServings(), req.getType(), excludes,
+                            includes,
+                            pageable);
+        }
         return SearchConverter.INSTANCE.queryEntityToQueryService(query);
 
     }
